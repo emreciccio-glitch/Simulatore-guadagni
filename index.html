@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<!-- skill:chrome -->
+<style>
+/* Credit line — bottom-right */
+.design-ui-credit {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  font: 11px/1 system-ui, sans-serif;
+  color: rgba(128,128,128,0.5);
+  pointer-events: none;
+  z-index: 2147483647;
+  transition: opacity 0.4s ease;
+  user-select: none;
+  letter-spacing: 0.02em;
+}
+
+/* Hide chrome on touch devices */
+@media (hover: none) {
+  .design-ui-credit { display: none; }
+}
+
+/* Print fixes */
+@media print {
+  * {
+    transition: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .design-ui-credit { display: none !important; }
+}
+
+</style>
+<script>
+(function () {
+    // Design-ui pages are single compositions, so the whole body is editable.
+    function markEditable() {
+        document.body.classList.add('artifact-editable');
+    }
+
+    // Credit badge with idle-fade. Hover devices only.
+    function initChromeUI() {
+        if (!matchMedia('(hover: hover)').matches) return;
+
+        var credit = document.createElement('div');
+        credit.className = 'design-ui-credit';
+        credit.setAttribute('aria-hidden', 'true');
+        credit.innerHTML = '\u{1F49C} by ClickUp Brain';
+        document.body.appendChild(credit);
+
+        var timer = null;
+        var fade = function (out) { credit.style.opacity = out ? '0' : ''; };
+        fade(true);
+        var show = function () {
+            fade(false);
+            clearTimeout(timer);
+            timer = setTimeout(function () { fade(true); }, 3000);
+        };
+        document.addEventListener('mousemove', show);
+        show();
+    }
+
+    function init() {
+        markEditable();
+        initChromeUI();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+
+</script>
+<!-- /skill:chrome -->
+<!-- skill:libraries -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js" integrity="sha384-XcdcwHqIPULERb2yDEM4R0XaQKU3YnDsrTmjACBZyfdVVqjh6xQ4/DCMd7XLcA6Y" crossorigin="anonymous"></script>
+<!-- /skill:libraries -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modello v2 · Tournament Faucet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:oklch(97% 0.008 82); --paper-2:oklch(93.5% 0.012 82); --paper-3:oklch(89.5% 0.014 82);
+    --ink:oklch(24% 0.018 275); --ink-2:oklch(43% 0.016 275); --ink-3:oklch(58% 0.014 275);
+    --rule:oklch(83% 0.012 82); --rule-hard:oklch(66% 0.014 275);
+    --rev:oklch(46% 0.098 172); --rev-soft:oklch(89% 0.038 172);
+    --cost:oklch(51% 0.145 32); --cost-soft:oklch(90% 0.048 32);
+    --net:oklch(42% 0.128 272); --net-soft:oklch(90% 0.045 272);
+    --chip:oklch(56% 0.132 52); --chip-soft:oklch(91% 0.045 52);
+    --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;--s9:96px;
+    --display:"Fraunces",Georgia,serif;
+    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    --ease:cubic-bezier(0.22,1,0.36,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:16px;line-height:1.5;
+       font-optical-sizing:auto;padding:0 var(--s5) var(--s9)}
+  .wrap{max-width:1180px;margin:0 auto}
+  h1,h2,h3{text-wrap:balance}
+  .num{font-variant-numeric:tabular-nums}
+  .eyebrow{font-size:.75rem;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3)}
+
+  header{padding:var(--s8) 0 var(--s6);border-bottom:1px solid var(--rule-hard)}
+  h1{font-family:var(--display);font-weight:600;font-size:clamp(2.3rem,5.6vw,3.9rem);line-height:.99;
+     letter-spacing:-.02em;margin:var(--s3) 0 var(--s4);max-width:24ch}
+  .lede{font-size:1.375rem;line-height:1.35;color:var(--ink-2);max-width:58ch;text-wrap:pretty}
+  .lede b{color:var(--ink);font-weight:600}
+
+  .panel{background:var(--paper-2);border-bottom:1px solid var(--rule-hard);
+         margin:0 calc(var(--s5)*-1);padding:var(--s5) var(--s5) var(--s6)}
+  .panel-in{max-width:1180px;margin:0 auto}
+  .panel-top{display:flex;flex-wrap:wrap;gap:var(--s5);align-items:center;margin-bottom:var(--s5)}
+  .seg{display:flex;border:1px solid var(--rule-hard);border-radius:2px;overflow:hidden}
+  .seg button{font:inherit;font-size:.875rem;font-weight:500;cursor:pointer;background:transparent;
+              color:var(--ink-2);border:none;padding:8px 16px;transition:background .12s var(--ease)}
+  .seg button + button{border-left:1px solid var(--rule-hard)}
+  .seg button:hover{background:var(--paper-3);color:var(--ink)}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+  .seg button:focus-visible{outline:2px solid var(--net);outline-offset:2px}
+  .gate{display:flex;align-items:center;gap:var(--s2);font-size:.875rem;color:var(--ink-2);cursor:pointer}
+  .gate input{width:18px;height:18px;accent-color:var(--net);cursor:pointer}
+  .knobs{display:grid;grid-template-columns:repeat(auto-fit,minmax(226px,1fr));gap:var(--s5) var(--s6)}
+  .knob label{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s3)}
+  .knob .k-name{font-size:.875rem;font-weight:500;color:var(--ink-2)}
+  .knob .k-val{font-family:var(--display);font-weight:600;font-size:1.25rem;font-variant-numeric:tabular-nums}
+  .knob input[type=range]{width:100%;margin-top:var(--s2);accent-color:var(--net);height:20px}
+  .knob .k-note{font-size:.75rem;color:var(--ink-3);margin-top:2px}
+
+  .cols{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:var(--s9);padding-top:var(--s7)}
+  @media (max-width:1000px){.cols{grid-template-columns:1fr;gap:var(--s7)}}
+  section{margin-bottom:var(--s8)}
+  .h-sec{display:flex;align-items:baseline;gap:var(--s3);margin-bottom:var(--s4);
+         padding-bottom:var(--s2);border-bottom:1px solid var(--rule-hard)}
+  .h-sec h2{font-family:var(--display);font-weight:600;font-size:1.5rem;letter-spacing:-.01em}
+  .h-sec .idx{font-family:var(--display);font-size:.875rem;color:var(--ink-3);font-weight:600}
+  p.body{font-size:.9375rem;color:var(--ink-2);max-width:68ch;text-wrap:pretty}
+  p.body + p.body{margin-top:var(--s3)}
+  p.body b{color:var(--ink);font-weight:600}
+
+  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  th{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);
+     text-align:right;padding:0 0 var(--s2);border-bottom:1px solid var(--rule)}
+  th:first-child{text-align:left}
+  td{padding:var(--s3) 0;border-bottom:1px solid var(--rule);text-align:right;font-size:.9375rem}
+  td:first-child{text-align:left;padding-right:var(--s4)}
+  .row-name{font-weight:500;color:var(--ink)}
+  .row-sub{display:block;font-size:.75rem;color:var(--ink-3);font-weight:400;font-variant-numeric:normal}
+  tr.total td{border-top:2px solid var(--rule-hard);border-bottom:none;padding-top:var(--s3);font-weight:600}
+  tr.total td:first-child{font-family:var(--display);font-size:1.0625rem}
+  .big{font-family:var(--display);font-weight:600;font-size:1.125rem}
+  .c-rev{color:var(--rev)}.c-cost{color:var(--cost)}.c-net{color:var(--net)}
+  .c-mute{color:var(--ink-3)}.c-chip{color:var(--chip)}
+  .delta{font-size:.8125rem;font-weight:600}
+  .up{color:var(--rev)}.down{color:var(--cost)}.flat{color:var(--ink-3)}
+
+  .summary{position:sticky;top:var(--s5)}
+  .stat{padding:var(--s4) 0;border-bottom:1px solid var(--rule)}
+  .stat:first-of-type{padding-top:0}
+  .stat .s-lab{font-size:.8125rem;color:var(--ink-2);display:flex;justify-content:space-between;gap:var(--s3)}
+  .stat .s-num{font-family:var(--display);font-weight:600;font-size:2.25rem;line-height:1.05;
+               letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:2px}
+  .stat .s-note{font-size:.75rem;color:var(--ink-3);margin-top:var(--s1)}
+  .stat.hero .s-num{font-size:3.25rem}
+  .flag{display:inline-flex;align-items:center;gap:6px;font-size:.6875rem;font-weight:600;
+        letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:2px}
+  .flag.ok{background:var(--rev-soft);color:var(--rev)}
+  .flag.bad{background:var(--cost-soft);color:var(--cost)}
+  .flag.chip{background:var(--chip-soft);color:var(--chip)}
+
+  .callout{background:var(--paper-2);padding:var(--s5);margin-top:var(--s6);border:1px solid var(--rule)}
+  .callout h3{font-family:var(--display);font-size:1.125rem;font-weight:600;margin-bottom:var(--s2)}
+  .callout p{font-size:.875rem;color:var(--ink-2);text-wrap:pretty;max-width:60ch}
+  .callout p+p{margin-top:var(--s3)}
+  .warn-line{margin-top:var(--s4);padding:var(--s3) var(--s4);background:var(--cost-soft);
+             color:var(--cost);font-size:.8125rem;font-weight:500;border-radius:2px;display:none}
+  .warn-line.on{display:block}
+
+  .chart-box{height:280px;margin-top:var(--s5)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:var(--s6)}
+  @media (max-width:700px){.two{grid-template-columns:1fr}}
+  .cur h3{font-family:var(--display);font-size:1.25rem;font-weight:600;margin-bottom:var(--s1)}
+  .cur .tag{font-size:.6875rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+  .cur p{font-size:.875rem;color:var(--ink-2);margin-top:var(--s3);max-width:44ch;text-wrap:pretty}
+  .cur ul{list-style:none;margin-top:var(--s3);font-size:.8125rem;color:var(--ink-2)}
+  .cur li{padding:var(--s2) 0;border-top:1px solid var(--rule);display:flex;gap:var(--s3)}
+  .cur li b{font-weight:600;color:var(--ink);min-width:88px}
+
+  .notes{border-top:1px solid var(--rule-hard);padding-top:var(--s5);margin-top:var(--s6)}
+  .notes ol{list-style:none;counter-reset:n;columns:2;column-gap:var(--s7)}
+  @media (max-width:760px){.notes ol{columns:1}}
+  .notes li{counter-increment:n;font-size:.8125rem;color:var(--ink-2);padding-left:var(--s5);
+            position:relative;margin-bottom:var(--s3);break-inside:avoid}
+  .notes li::before{content:counter(n);position:absolute;left:0;font-family:var(--display);
+                    font-weight:600;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Modello v2 · Tournament Faucet · revisione del 16 agosto 2026</p>
+    <h1>Il prize pool si decide prima. Tutto il resto è distribuzione.</h1>
+    <p class="lede">Nella v1 il costo cresceva col traffico e speravi che il margine sopravvivesse. Qui il margine è <b>un parametro</b>, non un esito. Cinque righe del bilancio cambiano natura, e una sparisce del tutto.</p>
+  </header>
+
+  <div class="panel">
+    <div class="panel-in">
+      <div class="panel-top">
+        <div>
+          <span class="eyebrow" style="display:block;margin-bottom:var(--s2)">Cadenza del torneo</span>
+          <div class="seg" id="cadence">
+            <button data-c="d" aria-pressed="false">Giornaliero</button>
+            <button data-c="w" aria-pressed="true">Settimanale</button>
+            <button data-c="m" aria-pressed="false">Mensile</button>
+          </div>
+        </div>
+        <div>
+          <span class="eyebrow" style="display:block;margin-bottom:var(--s2)">Difesa strutturale</span>
+          <label class="gate"><input type="checkbox" id="gate" checked>
+            Claim base sbloccato solo dopo 1 offerta validata</label>
+        </div>
+      </div>
+      <div class="knobs" id="knobs"></div>
+    </div>
+  </div>
+
+  <div class="cols">
+    <main>
+      <section>
+        <div class="h-sec"><span class="idx">01</span><h2>Cosa cambia nel bilancio</h2></div>
+        <table>
+          <thead><tr><th>Voce</th><th>Modello v1</th><th>Modello v2</th><th>Effetto</th></tr></thead>
+          <tbody id="diff-rows"></tbody>
+        </table>
+      </section>
+
+      <section>
+        <div class="h-sec"><span class="idx">02</span><h2>Due valute, mai una</h2></div>
+        <p class="body">Il torneo funziona solo se separi la competizione dal denaro. Se i punti sono contemporaneamente classifica e saldo prelevabile, il sistema si contraddice: azzerare la classifica azzererebbe i soldi della gente.</p>
+        <div class="two" style="margin-top:var(--s5)">
+          <div class="cur">
+            <span class="tag c-chip">Non prelevabile</span>
+            <h3>Chips</h3>
+            <p>Guadagnate con ogni task. Servono solo a determinare la posizione. Si azzerano alla fine di ogni torneo.</p>
+            <ul>
+              <li><b>Fonte</b><span>faucet, offerte, PTC, shortlink, streak</span></li>
+              <li><b>Vita</b><span>un torneo</span></li>
+              <li><b>Valore</b><span>relativo agli altri giocatori</span></li>
+              <li><b>Costo per te</b><span>zero, sono numeri</span></li>
+            </ul>
+          </div>
+          <div class="cur">
+            <span class="tag c-rev">Prelevabile</span>
+            <h3>Saldo</h3>
+            <p>Denaro vero in satoshi. Arriva solo da due posti: premi del torneo e claim base garantito. Va su FaucetPay.</p>
+            <ul>
+              <li><b>Fonte</b><span>premi + claim base</span></li>
+              <li><b>Vita</b><span>permanente, cumulabile</span></li>
+              <li><b>Valore</b><span>fisso, in crypto</span></li>
+              <li><b>Costo per te</b><span>l'intero budget</span></li>
+            </ul>
+          </div>
+        </div>
+        <p class="body" style="margin-top:var(--s5)">Conseguenza pratica: le chips le puoi regalare a piene mani. Bonus streak, moltiplicatori, jackpot da 10.000 chips, tutto gratis. È generosità percepita a costo zero, perché il budget vero resta bloccato nel pool. È esattamente il motivo per cui i tornei di poker regalano stack enormi senza regalare un centesimo.</p>
+      </section>
+
+      <section>
+        <div class="h-sec"><span class="idx">03</span><h2>Struttura dei premi</h2></div>
+        <p class="body">Pool di <b class="num" id="pool-str">—</b> distribuito su <b class="num" id="places-str">—</b> posti pagati. L'esponente di concentrazione decide il carattere del gioco: piatto premia la costanza e trattiene i casuali, ripido crea un titolo da prima pagina e attira i grinder.</p>
+        <table style="margin-top:var(--s5)">
+          <thead><tr><th>Posizione</th><th>Premio</th><th>Quota pool</th><th>In chips vinte serve</th></tr></thead>
+          <tbody id="prize-rows"></tbody>
+        </table>
+        <div class="warn-line" id="bubble-warn"></div>
+        <div class="chart-box"><canvas id="curve"></canvas></div>
+      </section>
+
+      <section>
+        <div class="h-sec"><span class="idx">04</span><h2>Stress test: mille bot entrano stanotte</h2></div>
+        <p class="body">Stessa invasione, due modelli. Nella v1 il payout è una percentuale del lordo distribuita per azione, quindi ogni account falso preleva valore reale. Nella v2 il pool è già fissato: i bot si diluiscono a vicenda e l'unico costo che ti lasciano è il claim base, che il gate elimina.</p>
+        <table style="margin-top:var(--s4)">
+          <thead><tr><th>Scenario</th><th>Account</th><th>Costo payout</th><th>Utile netto</th><th>Margine</th></tr></thead>
+          <tbody id="stress-rows"></tbody>
+        </table>
+        <p class="body" style="margin-top:var(--s4)">Prova a togliere la spunta del gate in alto: il claim base torna a essere pagato a tutti e vedi la terza riga peggiorare. Quello è l'unico buco rimasto nel modello, e si chiude con una riga di logica, non con un firewall.</p>
+      </section>
+    </main>
+
+    <aside>
+      <div class="summary">
+        <div class="stat hero">
+          <div class="s-lab"><span>Utile netto mensile</span><span class="flag" id="verdict"></span></div>
+          <div class="s-num c-net" id="k-net">—</div>
+          <div class="s-note" id="k-net-note"></div>
+        </div>
+        <div class="stat">
+          <div class="s-lab"><span>Margine garantito per costruzione</span></div>
+          <div class="s-num" id="k-margin">—</div>
+          <div class="s-note" id="k-margin-note"></div>
+        </div>
+        <div class="stat">
+          <div class="s-lab"><span>Premio più alto</span><span class="flag chip" id="cad-flag"></span></div>
+          <div class="s-num c-chip" id="k-top">—</div>
+          <div class="s-note" id="k-top-note"></div>
+        </div>
+        <div class="stat">
+          <div class="s-lab"><span>Delta vs modello v1</span></div>
+          <div class="s-num" id="k-delta">—</div>
+          <div class="s-note">A parità di utenti e ricavi. Il guadagno viene da payout controllato e bot neutralizzati, non da più traffico.</div>
+        </div>
+        <div class="stat">
+          <div class="s-lab"><span>Cassa da anticipare</span></div>
+          <div class="s-num c-cost" id="k-float">—</div>
+          <div class="s-note">30 giorni di pool più claim base. Le offerwall pagano a 15-30 giorni, i premi si assegnano subito.</div>
+        </div>
+
+        <div class="callout">
+          <h3>Le tre decisioni che restano tue</h3>
+          <p><b>Overlay iniziale.</b> Al lancio il pool sarà ridicolo perché i ricavi sono zero. Come nei tornei con garantito, ci metti tu la differenza per le prime settimane. È spesa di marketing con un tetto noto in anticipo, non un buco: mettila a bilancio e sappi quando la spegni.</p>
+          <p><b>Cadenza.</b> Sotto i 500-600 utenti attivi il pool giornaliero è troppo diluito per essere emozionante. Parti settimanale, dove il premio si concentra, e passa al giornaliero quando il campo regge. Il mensile lo tieni come evento sopra gli altri, non come formato base.</p>
+          <p><b>Il claim base va lasciato vivo.</b> Chi arriva ultimo ogni giorno se ne va, e a te serve che resti a generare impression. Tienilo piccolo, gancialo alla prima offerta validata e non toccarlo mai più.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="notes">
+    <p class="eyebrow" style="margin-bottom:var(--s4)">Assunzioni</p>
+    <ol>
+      <li>Ricavo base per utente al giorno ereditato dal modello v1 (0,0606 $ nello scenario realistico), più un aumento di engagement per classifica e ritorni giornalieri, regolabile qui sopra.</li>
+      <li>Premi distribuiti come legge di potenza: peso della posizione r pari a r elevato a meno l'esponente, normalizzato sul pool. Con esponente 1 è la serie armonica, la struttura classica dei tornei.</li>
+      <li>Partecipanti unici per evento: pari agli attivi giornalieri nel formato daily, circa 2,2 volte nel settimanale, 3,5 nel mensile. Più lungo è il torneo, più gente lo attraversa.</li>
+      <li>I payout verso utenti FaucetPay non hanno fee. Il 3% si paga solo sui Coin Swap, quindi solo sulla quota di premi che l'utente converte in un'altra moneta.</li>
+      <li>La v2 riduce le transazioni: i premi si assegnano in blocco alla chiusura del torneo invece che a ogni claim. Meno chiamate API, meno superficie per errori, rate limit di 60 al minuto mai in pericolo.</li>
+      <li>Ogni invio usa una idempotency_key sulla v2 delle API: se la distribuzione del pool va in errore a metà e la ripeti, nessuno viene pagato due volte. Con l'endpoint v1 questa garanzia non ce l'hai.</li>
+      <li>Il traffico bot non produce ricavo pubblicitario utilizzabile: le impression da datacenter e VPN vengono scartate dai network come traffico non valido. Nel modello valgono zero, non poco.</li>
+      <li>Lo scrub sulle offerte resta un costo reale ma cambia posto: non riduce più il payout dovuto, riduce il pool del torneo successivo. Il rischio si sposta dall'utile al premio.</li>
+    </ol>
+  </div>
+</div>
+
+<script>
+const KNOBS = [
+  {id:'dau',    name:'Utenti attivi/giorno',   min:20,max:3000,step:10,  fmt:v=>v.toLocaleString('it-IT'), note:'utenti reali, bot esclusi'},
+  {id:'rpu',    name:'Ricavo per utente/dì',   min:0.01,max:0.2,step:0.005,fmt:v=>'$'+v.toFixed(3), note:'v1 realistico: $0,061'},
+  {id:'uplift', name:'Uplift da engagement',   min:0,max:80,step:5,      fmt:v=>'+'+v+'%',        note:'classifica, streak, ritorni'},
+  {id:'poolPct',name:'Pool sul lordo',         min:20,max:80,step:1,     fmt:v=>v+'%',            note:'la leva del margine'},
+  {id:'alpha',  name:'Concentrazione premi',   min:0.3,max:1.8,step:0.05,fmt:v=>v.toFixed(2),     note:'piatto ← → top heavy'},
+  {id:'paidPct',name:'Campo pagato',           min:5,max:70,step:5,      fmt:v=>v+'%',            note:'quota che vince qualcosa'},
+  {id:'base',   name:'Claim base giornaliero', min:0,max:0.02,step:0.001,fmt:v=>'$'+v.toFixed(3), note:'pavimento anti abbandono'},
+  {id:'botPct', name:'Account bot',            min:0,max:300,step:5,     fmt:v=>v+'%',            note:'in % degli utenti reali'},
+  {id:'swapSh', name:'Premi convertiti',       min:0,max:100,step:5,     fmt:v=>v+'%',            note:'3% di fee su questa quota'},
+  {id:'overlay',name:'Overlay garantito',      min:0,max:400,step:10,    fmt:v=>'$'+v,            note:'la tua quota nel pool /mese'},
+  {id:'fixed',  name:'Infrastruttura',         min:0,max:200,step:5,     fmt:v=>'$'+v,            note:'Vercel, Postgres, dominio'}
+];
+
+let S = {dau:300,rpu:0.061,uplift:25,poolPct:50,alpha:0.9,paidPct:40,base:0.004,
+         botPct:33,swapSh:40,overlay:0,fixed:35};
+let CAD = 'w', GATE = true;
+const CADS = {d:{n:'giornaliero',days:1,reach:1,per:'al giorno'},
+              w:{n:'settimanale',days:7,reach:2.2,per:'a settimana'},
+              m:{n:'mensile',days:30,reach:3.5,per:'al mese'}};
+
+const $ = s=>document.querySelector(s);
+const usd=(v,d=0)=>(v<0?'-':'')+'$'+Math.abs(v).toLocaleString('it-IT',{minimumFractionDigits:d,maximumFractionDigits:d});
+const c4=v=>'$'+v.toFixed(4).replace('.',',');
+
+/* ---------- model ---------- */
+function model(s,botMult,gate){
+  const rpu = s.rpu*(1+s.uplift/100);
+  const gross = rpu*s.dau*30;
+  const pool  = gross*s.poolPct/100 + s.overlay;
+  const bots  = Math.round(s.dau*(s.botPct/100)*botMult);
+  const paying= gate ? s.dau : s.dau+bots;
+  const baseTot = paying*s.base*30;
+  const swap  = (pool+baseTot)*s.swapSh/100*0.03;
+  const net   = gross - pool - baseTot - swap - s.fixed;
+  return {gross,pool,bots,baseTot,swap,net,
+          margin: gross? net/gross*100 : 0,
+          payoutCost: pool+baseTot+swap};
+}
+/* v1 comparison: payout % of gross + bot leakage on all payouts */
+function v1(s,botMult){
+  const gross=s.rpu*s.dau*30;
+  const payouts=gross*0.60;
+  const botLoss=payouts*Math.min(0.12*botMult,0.85);
+  const swap=payouts*0.50*0.03;
+  const net=gross-payouts-botLoss-swap-s.fixed;
+  return {gross,net,margin:gross?net/gross*100:0,payoutCost:payouts+botLoss+swap,
+          bots:Math.round(s.dau*(s.botPct/100)*botMult)};
+}
+function prizes(pool,K,alpha){
+  let sum=0; for(let r=1;r<=K;r++) sum+=Math.pow(r,-alpha);
+  return {sum,at:r=>pool*Math.pow(r,-alpha)/sum};
+}
+
+/* ---------- render ---------- */
+function render(){
+  const cad=CADS[CAD], m=model(S,1,GATE), o=v1(S,1);
+
+  /* diff table */
+  const rows=[
+    ['Punti pagati agli utenti','60% del lordo, variabile',S.poolPct+'% del lordo, deciso prima','Da rischio a parametro','up'],
+    ['Perdita per bot',usd(o.gross*0.60*0.12)+' al mese',GATE?'$0':usd(m.bots*S.base*30),GATE?'Eliminata dal gate':'Ridotta al solo claim base','up'],
+    ['Fee swap FaucetPay',usd(o.gross*0.60*0.50*0.03),usd(m.swap),'Meno payout, meno conversioni','up'],
+    ['Claim base garantito','non esisteva',usd(m.baseTot),'Nuovo costo, tiene vivi gli ultimi','down'],
+    ['Overlay sul pool','non esisteva',S.overlay?usd(S.overlay):'$0','Marketing con tetto noto',S.overlay?'down':'flat'],
+    ['Infrastruttura',usd(S.fixed),usd(S.fixed),'Cron di chiusura torneo in più','flat']
+  ];
+  $('#diff-rows').innerHTML=rows.map(r=>`<tr>
+    <td><span class="row-name">${r[0]}</span></td>
+    <td class="num c-mute">${r[1]}</td>
+    <td class="num big ${r[4]==='down'?'c-cost':'c-net'}">${r[2]}</td>
+    <td class="delta ${r[4]}">${r[3]}</td></tr>`).join('')
+    +`<tr class="total"><td>Utile netto mensile</td><td class="num c-mute">${usd(o.net)}</td>
+      <td class="num big c-net">${usd(m.net)}</td>
+      <td class="delta ${m.net>=o.net?'up':'down'}">${m.net>=o.net?'+':''}${usd(m.net-o.net)}</td></tr>`;
+
+  /* prize structure */
+  const poolEvt = m.pool/30*cad.days;
+  const field = Math.round(S.dau*cad.reach);
+  const K = Math.max(Math.round(field*S.paidPct/100),1);
+  const P = prizes(poolEvt,K,S.alpha);
+  $('#pool-str').textContent=usd(poolEvt,2)+' '+cad.per;
+  $('#places-str').textContent=K.toLocaleString('it-IT')+' su '+field.toLocaleString('it-IT');
+
+  const marks=[[1,'1º posto'],[2,'2º'],[3,'3º'],[Math.max(Math.round(K*0.05),4),'Top 5% del campo pagato'],
+               [Math.max(Math.round(K*0.25),5),'Primo quartile'],[Math.max(Math.round(K*0.5),6),'Mediana dei pagati'],
+               [K,'Bolla, ultimo pagato']];
+  const seen=new Set();
+  $('#prize-rows').innerHTML=marks.filter(x=>x[0]<=K&&!seen.has(x[0])&&seen.add(x[0])).map(x=>{
+    const p=P.at(x[0]);
+    return `<tr><td><span class="row-name">${x[1]}</span><span class="row-sub">posizione ${x[0].toLocaleString('it-IT')}</span></td>
+      <td class="num big ${p<0.02?'c-cost':'c-chip'}">${p<0.01?c4(p):usd(p,2)}</td>
+      <td class="num c-mute">${(p/poolEvt*100).toFixed(2).replace('.',',')}%</td>
+      <td class="num c-mute">${Math.round(p/Math.max(P.at(K),1e-9))}× la bolla</td></tr>`;
+  }).join('');
+
+  const bubble=P.at(K), w=$('#bubble-warn');
+  if(bubble<0.02){
+    w.classList.add('on');
+    w.textContent=`La bolla vince ${c4(bubble)}: sotto la soglia dell'insulto. Riduci il campo pagato, alza la cadenza o appiattisci la curva, altrimenti chi arriva in fondo alla classifica si sente truffato invece che premiato.`;
+  } else w.classList.remove('on');
+
+  /* curve chart */
+  const pts=[],labels=[];
+  const step=Math.max(1,Math.floor(K/60));
+  for(let r=1;r<=K;r+=step){labels.push(r);pts.push(+P.at(r).toFixed(5));}
+  curve.data.labels=labels;
+  curve.data.datasets[0].data=pts;
+  curve.update();
+
+  /* stress test */
+  const s1=v1(S,1), s2=v1(S,3.5), s3=model(S,1,GATE), s4=model(S,3.5,GATE);
+  const st=[['v1 · traffico pulito',S.dau+s1.bots,s1],['v1 · invasione bot',S.dau+s2.bots,s2],
+            ['v2 · traffico pulito',S.dau+s3.bots,s3],['v2 · invasione bot',S.dau+s4.bots,s4]];
+  $('#stress-rows').innerHTML=st.map((r,i)=>`<tr>
+    <td><span class="row-name">${r[0]}</span>${i===3?'<span class="row-sub">'+(GATE?'gate attivo':'gate disattivato')+'</span>':''}</td>
+    <td class="num c-mute">${r[1].toLocaleString('it-IT')}</td>
+    <td class="num c-cost">${usd(r[2].payoutCost)}</td>
+    <td class="num big ${r[2].net>=0?'c-net':'c-cost'}">${usd(r[2].net)}</td>
+    <td class="num ${r[2].margin>=15?'c-rev':r[2].margin>=0?'c-chip':'c-cost'}">${r[2].margin.toFixed(1).replace('.',',')}%</td></tr>`).join('');
+
+  /* summary */
+  $('#k-net').textContent=usd(m.net);
+  $('#k-net').style.color=m.net>=0?'var(--net)':'var(--cost)';
+  $('#k-net-note').textContent=`${usd(m.net/30,1)} al giorno · lordo ${usd(m.gross)} al mese`;
+  $('#k-margin').textContent=m.margin.toFixed(1).replace('.',',')+'%';
+  $('#k-margin').style.color=m.margin>=15?'var(--rev)':m.margin>=0?'var(--chip)':'var(--cost)';
+  $('#k-margin-note').textContent=`Con pool al ${S.poolPct}% il tetto teorico è ${(100-S.poolPct)}%. La differenza sono claim base, swap e infrastruttura.`;
+  const v=$('#verdict');
+  if(m.net<=0){v.className='flag bad';v.textContent='In perdita';}
+  else if(m.margin<12){v.className='flag bad';v.textContent='Fragile';}
+  else {v.className='flag ok';v.textContent='Sostenibile';}
+  $('#k-top').textContent=usd(P.at(1),2);
+  $('#cad-flag').textContent=cad.n;
+  $('#k-top-note').textContent=`Il titolo che metti in home. Bolla a ${c4(bubble)}, ${K.toLocaleString('it-IT')} posti pagati su ${field.toLocaleString('it-IT')} partecipanti.`;
+  const d=m.net-o.net;
+  $('#k-delta').textContent=(d>=0?'+':'')+usd(d);
+  $('#k-delta').style.color=d>=0?'var(--rev)':'var(--cost)';
+  $('#k-float').textContent=usd(m.pool+m.baseTot);
+}
+
+/* ---------- chart ---------- */
+const ink='oklch(43% 0.016 275)',rule='oklch(83% 0.012 82)';
+const curve=new Chart($('#curve'),{
+  type:'line',
+  data:{labels:[],datasets:[{label:'Premio per posizione',data:[],
+    borderColor:'oklch(56% 0.132 52)',borderWidth:2,pointRadius:0,pointHoverRadius:4,
+    tension:.2,fill:true,backgroundColor:'oklch(91% 0.045 52)'}]},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},
+      tooltip:{backgroundColor:'oklch(24% 0.018 275)',padding:10,cornerRadius:2,displayColors:false,
+        callbacks:{title:c=>'Posizione '+c[0].label,label:c=>usd(c.parsed.y,4)}}},
+    scales:{x:{title:{display:true,text:'posizione in classifica',color:ink,font:{size:11}},
+               grid:{display:false},border:{color:rule},ticks:{color:ink,font:{size:11},maxTicksLimit:9}},
+            y:{type:'logarithmic',grid:{color:rule},border:{display:false},
+               ticks:{color:ink,font:{size:11},callback:v=>usd(v,v<1?2:0)}}}}
+});
+
+/* ---------- controls ---------- */
+$('#knobs').innerHTML=KNOBS.map(k=>`
+  <div class="knob">
+    <label for="i-${k.id}"><span class="k-name">${k.name}</span><span class="k-val" id="v-${k.id}"></span></label>
+    <input type="range" id="i-${k.id}" min="${k.min}" max="${k.max}" step="${k.step}" value="${S[k.id]}">
+    <p class="k-note">${k.note}</p>
+  </div>`).join('');
+KNOBS.forEach(k=>{
+  $('#v-'+k.id).textContent=k.fmt(S[k.id]);
+  $('#i-'+k.id).addEventListener('input',e=>{
+    S[k.id]=parseFloat(e.target.value);
+    $('#v-'+k.id).textContent=k.fmt(S[k.id]);
+    render();
+  });
+});
+document.querySelectorAll('#cadence button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#cadence button').forEach(x=>x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');CAD=b.dataset.c;render();
+  });
+});
+$('#gate').addEventListener('change',e=>{GATE=e.target.checked;render();});
+render();
+</script>
+</body>
+</html>
