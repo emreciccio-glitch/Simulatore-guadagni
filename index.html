@@ -83,455 +83,656 @@
 <!-- skill:libraries -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js" integrity="sha384-XcdcwHqIPULERb2yDEM4R0XaQKU3YnDsrTmjACBZyfdVVqjh6xQ4/DCMd7XLcA6Y" crossorigin="anonymous"></script>
 <!-- /skill:libraries -->
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Modello v2 · Tournament Faucet</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --paper:oklch(97% 0.008 82); --paper-2:oklch(93.5% 0.012 82); --paper-3:oklch(89.5% 0.014 82);
-    --ink:oklch(24% 0.018 275); --ink-2:oklch(43% 0.016 275); --ink-3:oklch(58% 0.014 275);
-    --rule:oklch(83% 0.012 82); --rule-hard:oklch(66% 0.014 275);
-    --rev:oklch(46% 0.098 172); --rev-soft:oklch(89% 0.038 172);
-    --cost:oklch(51% 0.145 32); --cost-soft:oklch(90% 0.048 32);
-    --net:oklch(42% 0.128 272); --net-soft:oklch(90% 0.045 272);
-    --chip:oklch(56% 0.132 52); --chip-soft:oklch(91% 0.045 52);
-    --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;--s9:96px;
-    --display:"Fraunces",Georgia,serif;
-    --ui:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
-    --ease:cubic-bezier(0.22,1,0.36,1);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{-webkit-text-size-adjust:100%}
-  body{background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:16px;line-height:1.5;
-       font-optical-sizing:auto;padding:0 var(--s5) var(--s9)}
-  .wrap{max-width:1180px;margin:0 auto}
-  h1,h2,h3{text-wrap:balance}
-  .num{font-variant-numeric:tabular-nums}
-  .eyebrow{font-size:.75rem;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3)}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faucet Arena · Modello V2 (interno)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* dark, warm, intentional: surfaces get lighter with elevation */
+      --s0: oklch(19% 0.014 70);
+      --s1: oklch(24% 0.016 70);
+      --s2: oklch(28% 0.018 70);
+      --s3: oklch(33% 0.02 70);
+      --line: oklch(36% 0.018 70);
+      --line-soft: oklch(30% 0.016 70);
+      --cream: oklch(94% 0.018 80);
+      --cream-soft: oklch(80% 0.02 75);
+      --cream-faint: oklch(66% 0.018 72);
+      --gold: oklch(80% 0.11 85);
+      --gold-deep: oklch(68% 0.12 82);
+      --money: oklch(76% 0.14 152);
+      --money-deep: oklch(62% 0.14 152);
+      --bad: oklch(68% 0.16 28);
+      --ctrl: oklch(62% 0.17 265);
+      --sp1: 4px; --sp2: 8px; --sp3: 12px; --sp4: 16px;
+      --sp5: 24px; --sp6: 32px; --sp7: 48px; --sp8: 64px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--s0); color: var(--cream);
+      font-family: "Manrope", system-ui, sans-serif; font-size: 15px; font-weight: 350;
+      line-height: 1.55; letter-spacing: 0.01em; -webkit-font-smoothing: antialiased;
+    }
+    h1, h2, h3 { margin: 0; letter-spacing: -0.02em; line-height: 1.1; }
+    .display { font-family: "Fraunces", Georgia, serif; font-weight: 600; letter-spacing: -0.02em; }
+    p { text-wrap: pretty; }
+    .num { font-variant-numeric: tabular-nums; }
+    .wrap { max-width: 1460px; margin: 0 auto; padding: 0 clamp(16px, 3vw, 40px); }
+    .lbl { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cream-faint); }
 
-  header{padding:var(--s8) 0 var(--s6);border-bottom:1px solid var(--rule-hard)}
-  h1{font-family:var(--display);font-weight:600;font-size:clamp(2.3rem,5.6vw,3.9rem);line-height:.99;
-     letter-spacing:-.02em;margin:var(--s3) 0 var(--s4);max-width:24ch}
-  .lede{font-size:1.375rem;line-height:1.35;color:var(--ink-2);max-width:58ch;text-wrap:pretty}
-  .lede b{color:var(--ink);font-weight:600}
+    /* header */
+    header { padding: var(--sp7) 0 var(--sp6); border-bottom: 1px solid var(--line-soft); }
+    .head-in { display: flex; align-items: flex-end; gap: var(--sp6); flex-wrap: wrap; }
+    header h1 { font-size: clamp(1.7rem, 3vw, 2.4rem); }
+    header h1 span { color: var(--gold); }
+    header p { margin: var(--sp3) 0 0; color: var(--cream-soft); max-width: 58ch; font-size: 0.95rem; }
+    .stamp { margin-left: auto; text-align: right; }
+    .stamp .v { font-family: "Fraunces", Georgia, serif; font-size: 1.5rem; color: var(--gold); }
 
-  .panel{background:var(--paper-2);border-bottom:1px solid var(--rule-hard);
-         margin:0 calc(var(--s5)*-1);padding:var(--s5) var(--s5) var(--s6)}
-  .panel-in{max-width:1180px;margin:0 auto}
-  .panel-top{display:flex;flex-wrap:wrap;gap:var(--s5);align-items:center;margin-bottom:var(--s5)}
-  .seg{display:flex;border:1px solid var(--rule-hard);border-radius:2px;overflow:hidden}
-  .seg button{font:inherit;font-size:.875rem;font-weight:500;cursor:pointer;background:transparent;
-              color:var(--ink-2);border:none;padding:8px 16px;transition:background .12s var(--ease)}
-  .seg button + button{border-left:1px solid var(--rule-hard)}
-  .seg button:hover{background:var(--paper-3);color:var(--ink)}
-  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
-  .seg button:focus-visible{outline:2px solid var(--net);outline-offset:2px}
-  .gate{display:flex;align-items:center;gap:var(--s2);font-size:.875rem;color:var(--ink-2);cursor:pointer}
-  .gate input{width:18px;height:18px;accent-color:var(--net);cursor:pointer}
-  .knobs{display:grid;grid-template-columns:repeat(auto-fit,minmax(226px,1fr));gap:var(--s5) var(--s6)}
-  .knob label{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s3)}
-  .knob .k-name{font-size:.875rem;font-weight:500;color:var(--ink-2)}
-  .knob .k-val{font-family:var(--display);font-weight:600;font-size:1.25rem;font-variant-numeric:tabular-nums}
-  .knob input[type=range]{width:100%;margin-top:var(--s2);accent-color:var(--net);height:20px}
-  .knob .k-note{font-size:.75rem;color:var(--ink-3);margin-top:2px}
+    /* controls */
+    .controls { padding: var(--sp6) 0; border-bottom: 1px solid var(--line-soft); }
+    .ctrl-top { display: flex; gap: var(--sp8); flex-wrap: wrap; margin-bottom: var(--sp6); }
+    .cadence { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-top: var(--sp3); }
+    .cadence button {
+      font: inherit; font-weight: 700; padding: 12px 22px; border: 0; background: transparent;
+      color: var(--cream-soft); cursor: pointer; transition: background-color 160ms var(--ease), color 160ms var(--ease);
+      border-right: 1px solid var(--line);
+    }
+    .cadence button:last-child { border-right: 0; }
+    .cadence button[aria-pressed="true"] { background: var(--s3); color: var(--cream); }
+    .cadence button:hover:not([aria-pressed="true"]) { background: var(--s1); }
+    .cadence button:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
 
-  .cols{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:var(--s9);padding-top:var(--s7)}
-  @media (max-width:1000px){.cols{grid-template-columns:1fr;gap:var(--s7)}}
-  section{margin-bottom:var(--s8)}
-  .h-sec{display:flex;align-items:baseline;gap:var(--s3);margin-bottom:var(--s4);
-         padding-bottom:var(--s2);border-bottom:1px solid var(--rule-hard)}
-  .h-sec h2{font-family:var(--display);font-weight:600;font-size:1.5rem;letter-spacing:-.01em}
-  .h-sec .idx{font-family:var(--display);font-size:.875rem;color:var(--ink-3);font-weight:600}
-  p.body{font-size:.9375rem;color:var(--ink-2);max-width:68ch;text-wrap:pretty}
-  p.body + p.body{margin-top:var(--s3)}
-  p.body b{color:var(--ink);font-weight:600}
+    .gate { display: flex; align-items: center; gap: var(--sp3); margin-top: var(--sp4); cursor: pointer; }
+    .gate input { width: 20px; height: 20px; accent-color: var(--ctrl); cursor: pointer; }
+    .gate span { font-weight: 600; }
 
-  table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-  th{font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);
-     text-align:right;padding:0 0 var(--s2);border-bottom:1px solid var(--rule)}
-  th:first-child{text-align:left}
-  td{padding:var(--s3) 0;border-bottom:1px solid var(--rule);text-align:right;font-size:.9375rem}
-  td:first-child{text-align:left;padding-right:var(--s4)}
-  .row-name{font-weight:500;color:var(--ink)}
-  .row-sub{display:block;font-size:.75rem;color:var(--ink-3);font-weight:400;font-variant-numeric:normal}
-  tr.total td{border-top:2px solid var(--rule-hard);border-bottom:none;padding-top:var(--s3);font-weight:600}
-  tr.total td:first-child{font-family:var(--display);font-size:1.0625rem}
-  .big{font-family:var(--display);font-weight:600;font-size:1.125rem}
-  .c-rev{color:var(--rev)}.c-cost{color:var(--cost)}.c-net{color:var(--net)}
-  .c-mute{color:var(--ink-3)}.c-chip{color:var(--chip)}
-  .delta{font-size:.8125rem;font-weight:600}
-  .up{color:var(--rev)}.down{color:var(--cost)}.flat{color:var(--ink-3)}
+    .grid-ctrl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp6) var(--sp7); }
+    .f label { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp3); margin-bottom: var(--sp3); }
+    .f .name { font-weight: 600; }
+    .f .val { font-family: "Fraunces", Georgia, serif; font-size: 1.5rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .f .val.money { color: var(--cream); }
+    .f input[type="range"] { width: 100%; accent-color: var(--ctrl); height: 20px; }
+    .f .hint { font-size: 0.82rem; color: var(--cream-faint); margin: var(--sp2) 0 0; }
 
-  .summary{position:sticky;top:var(--s5)}
-  .stat{padding:var(--s4) 0;border-bottom:1px solid var(--rule)}
-  .stat:first-of-type{padding-top:0}
-  .stat .s-lab{font-size:.8125rem;color:var(--ink-2);display:flex;justify-content:space-between;gap:var(--s3)}
-  .stat .s-num{font-family:var(--display);font-weight:600;font-size:2.25rem;line-height:1.05;
-               letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:2px}
-  .stat .s-note{font-size:.75rem;color:var(--ink-3);margin-top:var(--s1)}
-  .stat.hero .s-num{font-size:3.25rem}
-  .flag{display:inline-flex;align-items:center;gap:6px;font-size:.6875rem;font-weight:600;
-        letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:2px}
-  .flag.ok{background:var(--rev-soft);color:var(--rev)}
-  .flag.bad{background:var(--cost-soft);color:var(--cost)}
-  .flag.chip{background:var(--chip-soft);color:var(--chip)}
+    /* sections */
+    section.band { padding: var(--sp7) 0; border-bottom: 1px solid var(--line-soft); }
+    .sec-title { display: grid; grid-template-columns: auto 1fr; gap: var(--sp4); align-items: baseline; margin-bottom: var(--sp6); }
+    .sec-title .n { font-family: "Fraunces", Georgia, serif; color: var(--gold-deep); font-size: 0.9rem; }
+    .sec-title h2 { font-family: "Fraunces", Georgia, serif; font-size: clamp(1.4rem, 2.4vw, 2rem); font-weight: 600; }
 
-  .callout{background:var(--paper-2);padding:var(--s5);margin-top:var(--s6);border:1px solid var(--rule)}
-  .callout h3{font-family:var(--display);font-size:1.125rem;font-weight:600;margin-bottom:var(--s2)}
-  .callout p{font-size:.875rem;color:var(--ink-2);text-wrap:pretty;max-width:60ch}
-  .callout p+p{margin-top:var(--s3)}
-  .warn-line{margin-top:var(--s4);padding:var(--s3) var(--s4);background:var(--cost-soft);
-             color:var(--cost);font-size:.8125rem;font-weight:500;border-radius:2px;display:none}
-  .warn-line.on{display:block}
+    .split { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: var(--sp8); align-items: start; }
 
-  .chart-box{height:280px;margin-top:var(--s5)}
-  .two{display:grid;grid-template-columns:1fr 1fr;gap:var(--s6)}
-  @media (max-width:700px){.two{grid-template-columns:1fr}}
-  .cur h3{font-family:var(--display);font-size:1.25rem;font-weight:600;margin-bottom:var(--s1)}
-  .cur .tag{font-size:.6875rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
-  .cur p{font-size:.875rem;color:var(--ink-2);margin-top:var(--s3);max-width:44ch;text-wrap:pretty}
-  .cur ul{list-style:none;margin-top:var(--s3);font-size:.8125rem;color:var(--ink-2)}
-  .cur li{padding:var(--s2) 0;border-top:1px solid var(--rule);display:flex;gap:var(--s3)}
-  .cur li b{font-weight:600;color:var(--ink);min-width:88px}
+    /* ledger table */
+    table.ledger { width: 100%; border-collapse: collapse; }
+    table.ledger th { text-align: left; padding: 0 var(--sp4) var(--sp3) 0; border-bottom: 1px solid var(--line); }
+    table.ledger th:last-child, table.ledger td:last-child { text-align: right; padding-right: 0; }
+    table.ledger th:nth-child(2), table.ledger th:nth-child(3),
+    table.ledger td:nth-child(2), table.ledger td:nth-child(3) { text-align: right; }
+    table.ledger td { padding: var(--sp4) var(--sp4) var(--sp4) 0; border-bottom: 1px solid var(--line-soft); vertical-align: baseline; }
+    table.ledger tbody tr:last-child td { border-bottom: 0; }
+    .voice { font-weight: 600; }
+    .v1 { color: var(--cream-faint); font-variant-numeric: tabular-nums; }
+    .v2 { font-family: "Fraunces", Georgia, serif; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+    .v2.good { color: var(--money); }
+    .v2.cost { color: var(--cream); }
+    .effect { color: var(--cream-soft); font-size: 0.88rem; max-width: 26ch; }
 
-  .notes{border-top:1px solid var(--rule-hard);padding-top:var(--s5);margin-top:var(--s6)}
-  .notes ol{list-style:none;counter-reset:n;columns:2;column-gap:var(--s7)}
-  @media (max-width:760px){.notes ol{columns:1}}
-  .notes li{counter-increment:n;font-size:.8125rem;color:var(--ink-2);padding-left:var(--s5);
-            position:relative;margin-bottom:var(--s3);break-inside:avoid}
-  .notes li::before{content:counter(n);position:absolute;left:0;font-family:var(--display);
-                    font-weight:600;color:var(--ink-3)}
-</style>
+    /* kpi stack */
+    .kpi-stack { display: grid; gap: var(--sp5); }
+    .kpi { background: var(--s1); border: 1px solid var(--line-soft); border-radius: 16px; padding: var(--sp5); }
+    .kpi-head { display: flex; align-items: center; justify-content: space-between; gap: var(--sp3); margin-bottom: var(--sp3); }
+    .kpi .big { font-family: "Fraunces", Georgia, serif; font-size: clamp(2.4rem, 5vw, 3.4rem); font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+    .kpi .big.money { color: var(--money); }
+    .kpi .big.bad { color: var(--bad); }
+    .kpi .big.gold { color: var(--gold); }
+    .kpi .sub { color: var(--cream-soft); font-size: 0.88rem; margin: var(--sp3) 0 0; }
+    .tagpill { font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; padding: 5px 10px; border-radius: 6px; white-space: nowrap; }
+    .tagpill.ok { background: oklch(38% 0.09 152); color: oklch(88% 0.1 152); }
+    .tagpill.warn { background: oklch(40% 0.09 70); color: oklch(90% 0.1 80); }
+    .tagpill.bad { background: oklch(38% 0.1 28); color: oklch(90% 0.09 28); }
+    .tagpill.neutral { background: var(--s3); color: var(--cream-soft); }
+
+    /* pnl rows */
+    .pnl { display: grid; }
+    .pl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--sp4); align-items: baseline; padding: var(--sp3) 0; border-bottom: 1px solid var(--line-soft); }
+    .pl:last-child { border-bottom: 0; }
+    .pl .k { color: var(--cream-soft); }
+    .pl .k b { color: var(--cream); font-weight: 600; }
+    .pl .k small { display: block; color: var(--cream-faint); font-size: 0.8rem; }
+    .pl .v { font-variant-numeric: tabular-nums; font-weight: 700; }
+    .pl .v.out { color: var(--cream-faint); }
+    .pl .v.in { color: var(--money); }
+    .pl.tot { border-top: 1px solid var(--gold-deep); border-bottom: 0; margin-top: var(--sp3); padding-top: var(--sp4); }
+    .pl.tot .v { font-family: "Fraunces", Georgia, serif; font-size: 1.6rem; color: var(--money); }
+    .pl.tot .v.bad { color: var(--bad); }
+
+    /* chart + prize */
+    .chart-box { position: relative; height: 250px; }
+    table.prizes { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    table.prizes th { text-align: left; padding: 0 var(--sp3) var(--sp2) 0; border-bottom: 1px solid var(--line); }
+    table.prizes th:last-child, table.prizes td:last-child { text-align: right; padding-right: 0; }
+    table.prizes td { padding: 10px var(--sp3) 10px 0; border-bottom: 1px solid var(--line-soft); font-variant-numeric: tabular-nums; }
+    table.prizes tbody tr:last-child td { border-bottom: 0; }
+    td.rank { font-family: "Fraunces", Georgia, serif; color: var(--gold); width: 64px; }
+    td.prize { font-weight: 700; color: var(--money); }
+    tr.dust td { color: var(--cream-faint); }
+    tr.dust td.prize { color: var(--bad); }
+
+    .callout { padding: var(--sp4) var(--sp5); border-radius: 12px; background: var(--s1); border: 1px solid var(--line-soft); margin-top: var(--sp5); font-size: 0.9rem; color: var(--cream-soft); }
+    .callout b { display: block; color: var(--cream); margin-bottom: 4px; font-weight: 600; }
+    .callout.warn { border-color: oklch(44% 0.09 70); }
+    .callout.bad { border-color: oklch(44% 0.1 28); }
+    .callout.ok { border-color: oklch(42% 0.09 152); }
+
+    .period-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp4); }
+    .per { padding: var(--sp5); border-radius: 14px; background: var(--s1); border: 1px solid var(--line-soft); }
+    .per.on { background: var(--s2); border-color: var(--gold-deep); }
+    .per .p { font-family: "Fraunces", Georgia, serif; font-size: 1.8rem; color: var(--money); font-variant-numeric: tabular-nums; }
+    .per .t { margin-top: var(--sp2); font-size: 0.84rem; color: var(--cream-faint); }
+
+    footer { padding: var(--sp7) 0 var(--sp8); color: var(--cream-faint); font-size: 0.85rem; }
+    footer p { max-width: 92ch; margin: 0 0 var(--sp3); }
+
+    @media (max-width: 1180px) {
+      .grid-ctrl { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .split { grid-template-columns: 1fr; gap: var(--sp6); }
+    }
+    @media (max-width: 760px) {
+      .grid-ctrl { grid-template-columns: 1fr; gap: var(--sp5); }
+      .period-grid { grid-template-columns: 1fr; }
+      .stamp { margin-left: 0; text-align: left; }
+      table.ledger th:nth-child(2), table.ledger td:nth-child(2) { display: none; }
+      .effect { max-width: none; }
+      .cadence { width: 100%; }
+      .cadence button { flex: 1; padding: 12px 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; } }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <p class="eyebrow">Modello v2 · Tournament Faucet · revisione del 16 agosto 2026</p>
-    <h1>Il prize pool si decide prima. Tutto il resto è distribuzione.</h1>
-    <p class="lede">Nella v1 il costo cresceva col traffico e speravi che il margine sopravvivesse. Qui il margine è <b>un parametro</b>, non un esito. Cinque righe del bilancio cambiano natura, e una sparisce del tutto.</p>
-  </header>
-
-  <div class="panel">
-    <div class="panel-in">
-      <div class="panel-top">
+  <div class="wrap">
+    <header>
+      <div class="head-in">
         <div>
-          <span class="eyebrow" style="display:block;margin-bottom:var(--s2)">Cadenza del torneo</span>
-          <div class="seg" id="cadence">
-            <button data-c="d" aria-pressed="false">Giornaliero</button>
-            <button data-c="w" aria-pressed="true">Settimanale</button>
-            <button data-c="m" aria-pressed="false">Mensile</button>
+          <div class="lbl">simulatore interno · non pubblicare</div>
+          <h1 class="display">Modello <span>V2</span> · margine deciso prima, non sperato dopo</h1>
+          <p>Il pool è una percentuale fissa del lordo, il gate azzera i bot, il claim base tiene vivi gli ultimi. Sposta i parametri e guarda cosa resta a te.</p>
+        </div>
+        <div class="stamp">
+          <div class="lbl">utile netto mensile</div>
+          <div class="v num" id="stampNet">$0</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="controls">
+      <div class="ctrl-top">
+        <div>
+          <div class="lbl">cadenza del torneo</div>
+          <div class="cadence" id="cadence" role="group" aria-label="Cadenza del torneo">
+            <button type="button" data-days="1" aria-pressed="false">Giornaliero</button>
+            <button type="button" data-days="7" aria-pressed="true">Settimanale</button>
+            <button type="button" data-days="30" aria-pressed="false">Mensile</button>
           </div>
         </div>
         <div>
-          <span class="eyebrow" style="display:block;margin-bottom:var(--s2)">Difesa strutturale</span>
-          <label class="gate"><input type="checkbox" id="gate" checked>
-            Claim base sbloccato solo dopo 1 offerta validata</label>
+          <div class="lbl">difesa strutturale</div>
+          <label class="gate">
+            <input type="checkbox" id="gate" checked />
+            <span>Claim base sbloccato solo dopo 1 offerta validata</span>
+          </label>
         </div>
       </div>
-      <div class="knobs" id="knobs"></div>
+
+      <div class="grid-ctrl">
+        <div class="f">
+          <label for="users"><span class="name">Utenti attivi/giorno</span><span class="val num" id="oUsers">100</span></label>
+          <input type="range" id="users" min="10" max="3000" step="10" value="100" />
+          <p class="hint">utenti reali, bot esclusi</p>
+        </div>
+        <div class="f">
+          <label for="arpu"><span class="name">Ricavo per utente/dì</span><span class="val num" id="oArpu">$0.050</span></label>
+          <input type="range" id="arpu" min="0.005" max="0.3" step="0.001" value="0.05" />
+          <p class="hint">v1 realistico: $0,061</p>
+        </div>
+        <div class="f">
+          <label for="uplift"><span class="name">Uplift da engagement</span><span class="val num" id="oUplift">+25%</span></label>
+          <input type="range" id="uplift" min="0" max="80" step="5" value="25" />
+          <p class="hint">classifica, streak, ritorni</p>
+        </div>
+        <div class="f">
+          <label for="poolShare"><span class="name">Pool sul lordo</span><span class="val num" id="oPool">50%</span></label>
+          <input type="range" id="poolShare" min="20" max="70" step="1" value="50" />
+          <p class="hint">la leva del margine</p>
+        </div>
+
+        <div class="f">
+          <label for="alpha"><span class="name">Concentrazione premi</span><span class="val num" id="oAlpha">0.75</span></label>
+          <input type="range" id="alpha" min="0.2" max="2" step="0.05" value="0.75" />
+          <p class="hint">piatto ← → top heavy</p>
+        </div>
+        <div class="f">
+          <label for="paidField"><span class="name">Campo pagato</span><span class="val num" id="oPaid">50%</span></label>
+          <input type="range" id="paidField" min="5" max="100" step="1" value="50" />
+          <p class="hint">quota che vince qualcosa</p>
+        </div>
+        <div class="f">
+          <label for="baseClaim"><span class="name">Claim base giornaliero</span><span class="val num" id="oClaim">$0.001</span></label>
+          <input type="range" id="baseClaim" min="0" max="0.02" step="0.0005" value="0.001" />
+          <p class="hint">pavimento anti abbandono</p>
+        </div>
+        <div class="f">
+          <label for="bots"><span class="name">Account bot</span><span class="val num" id="oBots">0%</span></label>
+          <input type="range" id="bots" min="0" max="200" step="1" value="0" />
+          <p class="hint">in % degli utenti reali</p>
+        </div>
+
+        <div class="f">
+          <label for="converted"><span class="name">Premi convertiti</span><span class="val num" id="oConv">40%</span></label>
+          <input type="range" id="converted" min="0" max="100" step="5" value="40" />
+          <p class="hint">3% di fee su questa quota</p>
+        </div>
+        <div class="f">
+          <label for="overlay"><span class="name">Overlay garantito</span><span class="val num" id="oOverlay">$20</span></label>
+          <input type="range" id="overlay" min="0" max="300" step="5" value="20" />
+          <p class="hint">la tua quota nel pool /mese</p>
+        </div>
+        <div class="f">
+          <label for="infra"><span class="name">Infrastruttura</span><span class="val num" id="oInfra">$35</span></label>
+          <input type="range" id="infra" min="0" max="300" step="5" value="35" />
+          <p class="hint">Vercel, Postgres, dominio</p>
+        </div>
+        <div class="f">
+          <label for="minW"><span class="name">Minimo prelievo</span><span class="val num" id="oMin">$0.25</span></label>
+          <input type="range" id="minW" min="0.05" max="2" step="0.05" value="0.25" />
+          <p class="hint">sotto questa cifra il premio è polvere</p>
+        </div>
+      </div>
     </div>
-  </div>
 
-  <div class="cols">
-    <main>
-      <section>
-        <div class="h-sec"><span class="idx">01</span><h2>Cosa cambia nel bilancio</h2></div>
-        <table>
-          <thead><tr><th>Voce</th><th>Modello v1</th><th>Modello v2</th><th>Effetto</th></tr></thead>
-          <tbody id="diff-rows"></tbody>
-        </table>
-      </section>
+    <!-- 01 BILANCIO -->
+    <section class="band">
+      <div class="sec-title"><span class="n">01</span><h2>Cosa cambia nel bilancio</h2></div>
 
-      <section>
-        <div class="h-sec"><span class="idx">02</span><h2>Due valute, mai una</h2></div>
-        <p class="body">Il torneo funziona solo se separi la competizione dal denaro. Se i punti sono contemporaneamente classifica e saldo prelevabile, il sistema si contraddice: azzerare la classifica azzererebbe i soldi della gente.</p>
-        <div class="two" style="margin-top:var(--s5)">
-          <div class="cur">
-            <span class="tag c-chip">Non prelevabile</span>
-            <h3>Chips</h3>
-            <p>Guadagnate con ogni task. Servono solo a determinare la posizione. Si azzerano alla fine di ogni torneo.</p>
-            <ul>
-              <li><b>Fonte</b><span>faucet, offerte, PTC, shortlink, streak</span></li>
-              <li><b>Vita</b><span>un torneo</span></li>
-              <li><b>Valore</b><span>relativo agli altri giocatori</span></li>
-              <li><b>Costo per te</b><span>zero, sono numeri</span></li>
-            </ul>
+      <div class="split">
+        <div>
+          <table class="ledger">
+            <thead>
+              <tr><th class="lbl">Voce</th><th class="lbl">Modello V1</th><th class="lbl">Modello V2</th><th class="lbl">Effetto</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="voice">Punti pagati agli utenti</td>
+                <td class="v1" id="l1v1">60% del lordo, variabile</td>
+                <td class="v2 cost" id="l1v2">—</td>
+                <td class="effect">Da rischio a parametro</td>
+              </tr>
+              <tr>
+                <td class="voice">Perdita per bot</td>
+                <td class="v1 num" id="l2v1">—</td>
+                <td class="v2 cost num" id="l2v2">—</td>
+                <td class="effect" id="l2eff">Eliminata dal gate</td>
+              </tr>
+              <tr>
+                <td class="voice">Fee swap FaucetPay</td>
+                <td class="v1 num" id="l3v1">—</td>
+                <td class="v2 cost num" id="l3v2">—</td>
+                <td class="effect">Meno payout, meno conversioni</td>
+              </tr>
+              <tr>
+                <td class="voice">Claim base garantito</td>
+                <td class="v1" id="l4v1">non esisteva</td>
+                <td class="v2 cost num" id="l4v2">—</td>
+                <td class="effect">Nuovo costo, tiene vivi gli ultimi</td>
+              </tr>
+              <tr>
+                <td class="voice">Infrastruttura</td>
+                <td class="v1 num" id="l5v1">—</td>
+                <td class="v2 cost num" id="l5v2">—</td>
+                <td class="effect">Costo fisso, si diluisce col volume</td>
+              </tr>
+              <tr>
+                <td class="voice">Utile netto mensile</td>
+                <td class="v1 num" id="l6v1">—</td>
+                <td class="v2 good num" id="l6v2">—</td>
+                <td class="effect" id="l6eff">—</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="callout" id="beNote">
+            <b>Break-even</b>
+            <span id="beText">—</span>
           </div>
-          <div class="cur">
-            <span class="tag c-rev">Prelevabile</span>
-            <h3>Saldo</h3>
-            <p>Denaro vero in satoshi. Arriva solo da due posti: premi del torneo e claim base garantito. Va su FaucetPay.</p>
-            <ul>
-              <li><b>Fonte</b><span>premi + claim base</span></li>
-              <li><b>Vita</b><span>permanente, cumulabile</span></li>
-              <li><b>Valore</b><span>fisso, in crypto</span></li>
-              <li><b>Costo per te</b><span>l'intero budget</span></li>
-            </ul>
+        </div>
+
+        <div class="kpi-stack">
+          <div class="kpi">
+            <div class="kpi-head"><span class="lbl">utile netto mensile</span><span class="tagpill neutral" id="netTag">—</span></div>
+            <div class="big money num" id="kNet">$0</div>
+            <p class="sub" id="kNetSub">—</p>
           </div>
-        </div>
-        <p class="body" style="margin-top:var(--s5)">Conseguenza pratica: le chips le puoi regalare a piene mani. Bonus streak, moltiplicatori, jackpot da 10.000 chips, tutto gratis. È generosità percepita a costo zero, perché il budget vero resta bloccato nel pool. È esattamente il motivo per cui i tornei di poker regalano stack enormi senza regalare un centesimo.</p>
-      </section>
-
-      <section>
-        <div class="h-sec"><span class="idx">03</span><h2>Struttura dei premi</h2></div>
-        <p class="body">Pool di <b class="num" id="pool-str">—</b> distribuito su <b class="num" id="places-str">—</b> posti pagati. L'esponente di concentrazione decide il carattere del gioco: piatto premia la costanza e trattiene i casuali, ripido crea un titolo da prima pagina e attira i grinder.</p>
-        <table style="margin-top:var(--s5)">
-          <thead><tr><th>Posizione</th><th>Premio</th><th>Quota pool</th><th>In chips vinte serve</th></tr></thead>
-          <tbody id="prize-rows"></tbody>
-        </table>
-        <div class="warn-line" id="bubble-warn"></div>
-        <div class="chart-box"><canvas id="curve"></canvas></div>
-      </section>
-
-      <section>
-        <div class="h-sec"><span class="idx">04</span><h2>Stress test: mille bot entrano stanotte</h2></div>
-        <p class="body">Stessa invasione, due modelli. Nella v1 il payout è una percentuale del lordo distribuita per azione, quindi ogni account falso preleva valore reale. Nella v2 il pool è già fissato: i bot si diluiscono a vicenda e l'unico costo che ti lasciano è il claim base, che il gate elimina.</p>
-        <table style="margin-top:var(--s4)">
-          <thead><tr><th>Scenario</th><th>Account</th><th>Costo payout</th><th>Utile netto</th><th>Margine</th></tr></thead>
-          <tbody id="stress-rows"></tbody>
-        </table>
-        <p class="body" style="margin-top:var(--s4)">Prova a togliere la spunta del gate in alto: il claim base torna a essere pagato a tutti e vedi la terza riga peggiorare. Quello è l'unico buco rimasto nel modello, e si chiude con una riga di logica, non con un firewall.</p>
-      </section>
-    </main>
-
-    <aside>
-      <div class="summary">
-        <div class="stat hero">
-          <div class="s-lab"><span>Utile netto mensile</span><span class="flag" id="verdict"></span></div>
-          <div class="s-num c-net" id="k-net">—</div>
-          <div class="s-note" id="k-net-note"></div>
-        </div>
-        <div class="stat">
-          <div class="s-lab"><span>Margine garantito per costruzione</span></div>
-          <div class="s-num" id="k-margin">—</div>
-          <div class="s-note" id="k-margin-note"></div>
-        </div>
-        <div class="stat">
-          <div class="s-lab"><span>Premio più alto</span><span class="flag chip" id="cad-flag"></span></div>
-          <div class="s-num c-chip" id="k-top">—</div>
-          <div class="s-note" id="k-top-note"></div>
-        </div>
-        <div class="stat">
-          <div class="s-lab"><span>Delta vs modello v1</span></div>
-          <div class="s-num" id="k-delta">—</div>
-          <div class="s-note">A parità di utenti e ricavi. Il guadagno viene da payout controllato e bot neutralizzati, non da più traffico.</div>
-        </div>
-        <div class="stat">
-          <div class="s-lab"><span>Cassa da anticipare</span></div>
-          <div class="s-num c-cost" id="k-float">—</div>
-          <div class="s-note">30 giorni di pool più claim base. Le offerwall pagano a 15-30 giorni, i premi si assegnano subito.</div>
-        </div>
-
-        <div class="callout">
-          <h3>Le tre decisioni che restano tue</h3>
-          <p><b>Overlay iniziale.</b> Al lancio il pool sarà ridicolo perché i ricavi sono zero. Come nei tornei con garantito, ci metti tu la differenza per le prime settimane. È spesa di marketing con un tetto noto in anticipo, non un buco: mettila a bilancio e sappi quando la spegni.</p>
-          <p><b>Cadenza.</b> Sotto i 500-600 utenti attivi il pool giornaliero è troppo diluito per essere emozionante. Parti settimanale, dove il premio si concentra, e passa al giornaliero quando il campo regge. Il mensile lo tieni come evento sopra gli altri, non come formato base.</p>
-          <p><b>Il claim base va lasciato vivo.</b> Chi arriva ultimo ogni giorno se ne va, e a te serve che resti a generare impression. Tienilo piccolo, gancialo alla prima offerta validata e non toccarlo mai più.</p>
+          <div class="kpi">
+            <div class="kpi-head"><span class="lbl">margine garantito per costruzione</span></div>
+            <div class="big gold num" id="kMargin">0%</div>
+            <p class="sub" id="kMarginSub">—</p>
+          </div>
+          <div class="kpi">
+            <div class="kpi-head"><span class="lbl">premio più alto</span><span class="tagpill neutral" id="cadTag">Settimanale</span></div>
+            <div class="big money num" id="kTop">$0</div>
+            <p class="sub" id="kTopSub">—</p>
+          </div>
         </div>
       </div>
-    </aside>
+    </section>
+
+    <!-- 02 POOL -->
+    <section class="band">
+      <div class="sec-title"><span class="n">02</span><h2>Il montepremi per cadenza</h2></div>
+
+      <div class="split">
+        <div>
+          <div class="period-grid" id="periods"></div>
+          <div class="callout ok" style="margin-top: var(--sp5);">
+            <b>Perché la cadenza cambia tutto</b>
+            Lo stesso pool mensile spezzato in 30 tornei giornalieri dà premi minuscoli ma vittorie frequenti. In un torneo mensile dà un primo premio che si può raccontare, ma chi entra tardi non ci prova nemmeno. Il settimanale è il compromesso: abbastanza grande da attirare, abbastanza corto da ricominciare.
+          </div>
+        </div>
+
+        <div>
+          <div class="lbl" style="margin-bottom: var(--sp4);">conto economico mensile</div>
+          <div class="pnl">
+            <div class="pl"><div class="k"><b>Lordo generato</b><small id="grossDetail">—</small></div><div class="v in num" id="pGross">—</div></div>
+            <div class="pl"><div class="k">Pool dai ricavi<small>quota fissa sul lordo</small></div><div class="v out num" id="pPool">—</div></div>
+            <div class="pl"><div class="k">Overlay che metti tu<small>entra nel pool, esce dalle tue tasche</small></div><div class="v out num" id="pOverlay">—</div></div>
+            <div class="pl"><div class="k">Claim base<small id="claimDetail">—</small></div><div class="v out num" id="pClaim">—</div></div>
+            <div class="pl"><div class="k">Fee swap FaucetPay<small>3% sulla quota convertita</small></div><div class="v out num" id="pSwap">—</div></div>
+            <div class="pl"><div class="k">Perdita per bot<small id="botDetail">—</small></div><div class="v out num" id="pBot">—</div></div>
+            <div class="pl"><div class="k">Infrastruttura<small>Vercel, Postgres, dominio</small></div><div class="v out num" id="pInfra">—</div></div>
+            <div class="pl tot"><div class="k"><b>Resta a te</b><small id="netPct">—</small></div><div class="v num" id="pNet">—</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 PREMI -->
+    <section class="band">
+      <div class="sec-title"><span class="n">03</span><h2>Distribuzione dei premi</h2></div>
+
+      <div class="split">
+        <div>
+          <div class="chart-box"><canvas id="chart"></canvas></div>
+          <div class="callout" id="dustNote">
+            <b>Coda dei premi</b>
+            <span id="dustText">—</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="lbl" style="margin-bottom: var(--sp4);">vertice, centro e coda</div>
+          <table class="prizes">
+            <thead><tr><th class="lbl">Pos</th><th class="lbl">Premio</th><th class="lbl">Sul pool</th><th class="lbl">Giorni di claim base</th></tr></thead>
+            <tbody id="prizeRows"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p><b>Come calcolo la perdita per bot:</b> un bot non genera ricavo ma incassa il claim base e una fetta del pool pari alla sua quota di account. Col gate attivo il claim base non parte prima dell'offerta validata, quindi la voce va a zero. Nel modello V1 il gate non c'era, ed è lì che vedi la differenza.</p>
+      <p>Tutti gli importi sono in dollari lordi, un mese = 30 giorni. Il ricavo per utente è l'ipotesi più fragile: nei faucet reali sta tra 0,01 e 0,10 al giorno, quindi prima di fissare la garanzia prova sempre lo scenario basso. L'uplift da engagement è una scommessa sul prodotto, non un dato: tienilo prudente finché non hai una stagione vera da misurare.</p>
+    </footer>
   </div>
 
-  <div class="notes">
-    <p class="eyebrow" style="margin-bottom:var(--s4)">Assunzioni</p>
-    <ol>
-      <li>Ricavo base per utente al giorno ereditato dal modello v1 (0,0606 $ nello scenario realistico), più un aumento di engagement per classifica e ritorni giornalieri, regolabile qui sopra.</li>
-      <li>Premi distribuiti come legge di potenza: peso della posizione r pari a r elevato a meno l'esponente, normalizzato sul pool. Con esponente 1 è la serie armonica, la struttura classica dei tornei.</li>
-      <li>Partecipanti unici per evento: pari agli attivi giornalieri nel formato daily, circa 2,2 volte nel settimanale, 3,5 nel mensile. Più lungo è il torneo, più gente lo attraversa.</li>
-      <li>I payout verso utenti FaucetPay non hanno fee. Il 3% si paga solo sui Coin Swap, quindi solo sulla quota di premi che l'utente converte in un'altra moneta.</li>
-      <li>La v2 riduce le transazioni: i premi si assegnano in blocco alla chiusura del torneo invece che a ogni claim. Meno chiamate API, meno superficie per errori, rate limit di 60 al minuto mai in pericolo.</li>
-      <li>Ogni invio usa una idempotency_key sulla v2 delle API: se la distribuzione del pool va in errore a metà e la ripeti, nessuno viene pagato due volte. Con l'endpoint v1 questa garanzia non ce l'hai.</li>
-      <li>Il traffico bot non produce ricavo pubblicitario utilizzabile: le impression da datacenter e VPN vengono scartate dai network come traffico non valido. Nel modello valgono zero, non poco.</li>
-      <li>Lo scrub sulle offerte resta un costo reale ma cambia posto: non riduce più il payout dovuto, riduce il pool del torneo successivo. Il rischio si sposta dall'utile al premio.</li>
-    </ol>
-  </div>
-</div>
+  <script>
+    (function () {
+      var el = function (id) { return document.getElementById(id); };
+      var money = function (n, d) {
+        var neg = n < 0;
+        var s = '$' + Math.abs(n).toLocaleString('it-IT', { minimumFractionDigits: d === undefined ? 2 : d, maximumFractionDigits: d === undefined ? 2 : d });
+        return neg ? '−' + s : s;
+      };
+      var f = function (n, d) { return Number(n).toLocaleString('it-IT', { minimumFractionDigits: d, maximumFractionDigits: d }); };
 
-<script>
-const KNOBS = [
-  {id:'dau',    name:'Utenti attivi/giorno',   min:20,max:3000,step:10,  fmt:v=>v.toLocaleString('it-IT'), note:'utenti reali, bot esclusi'},
-  {id:'rpu',    name:'Ricavo per utente/dì',   min:0.01,max:0.2,step:0.005,fmt:v=>'$'+v.toFixed(3), note:'v1 realistico: $0,061'},
-  {id:'uplift', name:'Uplift da engagement',   min:0,max:80,step:5,      fmt:v=>'+'+v+'%',        note:'classifica, streak, ritorni'},
-  {id:'poolPct',name:'Pool sul lordo',         min:20,max:80,step:1,     fmt:v=>v+'%',            note:'la leva del margine'},
-  {id:'alpha',  name:'Concentrazione premi',   min:0.3,max:1.8,step:0.05,fmt:v=>v.toFixed(2),     note:'piatto ← → top heavy'},
-  {id:'paidPct',name:'Campo pagato',           min:5,max:70,step:5,      fmt:v=>v+'%',            note:'quota che vince qualcosa'},
-  {id:'base',   name:'Claim base giornaliero', min:0,max:0.02,step:0.001,fmt:v=>'$'+v.toFixed(3), note:'pavimento anti abbandono'},
-  {id:'botPct', name:'Account bot',            min:0,max:300,step:5,     fmt:v=>v+'%',            note:'in % degli utenti reali'},
-  {id:'swapSh', name:'Premi convertiti',       min:0,max:100,step:5,     fmt:v=>v+'%',            note:'3% di fee su questa quota'},
-  {id:'overlay',name:'Overlay garantito',      min:0,max:400,step:10,    fmt:v=>'$'+v,            note:'la tua quota nel pool /mese'},
-  {id:'fixed',  name:'Infrastruttura',         min:0,max:200,step:5,     fmt:v=>'$'+v,            note:'Vercel, Postgres, dominio'}
-];
+      var ids = ['users','arpu','uplift','poolShare','alpha','paidField','baseClaim','bots','converted','overlay','infra','minW'];
+      var days = 7;
+      var chart = null;
+      var SWAP_FEE = 0.03;
 
-let S = {dau:300,rpu:0.061,uplift:25,poolPct:50,alpha:0.9,paidPct:40,base:0.004,
-         botPct:33,swapSh:40,overlay:0,fixed:35};
-let CAD = 'w', GATE = true;
-const CADS = {d:{n:'giornaliero',days:1,reach:1,per:'al giorno'},
-              w:{n:'settimanale',days:7,reach:2.2,per:'a settimana'},
-              m:{n:'mensile',days:30,reach:3.5,per:'al mese'}};
+      function prizeList(pool, places, alpha) {
+        var n = Math.max(1, Math.round(places));
+        var w = [], tot = 0;
+        for (var i = 1; i <= n; i++) { var x = Math.pow(i, -alpha); w.push(x); tot += x; }
+        return w.map(function (x) { return pool * x / tot; });
+      }
 
-const $ = s=>document.querySelector(s);
-const usd=(v,d=0)=>(v<0?'-':'')+'$'+Math.abs(v).toLocaleString('it-IT',{minimumFractionDigits:d,maximumFractionDigits:d});
-const c4=v=>'$'+v.toFixed(4).replace('.',',');
+      function read() {
+        return {
+          users: +el('users').value,
+          arpu: +el('arpu').value,
+          uplift: +el('uplift').value / 100,
+          poolShare: +el('poolShare').value / 100,
+          alpha: +el('alpha').value,
+          paidField: +el('paidField').value / 100,
+          baseClaim: +el('baseClaim').value,
+          bots: +el('bots').value / 100,
+          converted: +el('converted').value / 100,
+          overlay: +el('overlay').value,
+          infra: +el('infra').value,
+          minW: +el('minW').value,
+          gate: el('gate').checked
+        };
+      }
 
-/* ---------- model ---------- */
-function model(s,botMult,gate){
-  const rpu = s.rpu*(1+s.uplift/100);
-  const gross = rpu*s.dau*30;
-  const pool  = gross*s.poolPct/100 + s.overlay;
-  const bots  = Math.round(s.dau*(s.botPct/100)*botMult);
-  const paying= gate ? s.dau : s.dau+bots;
-  const baseTot = paying*s.base*30;
-  const swap  = (pool+baseTot)*s.swapSh/100*0.03;
-  const net   = gross - pool - baseTot - swap - s.fixed;
-  return {gross,pool,bots,baseTot,swap,net,
-          margin: gross? net/gross*100 : 0,
-          payoutCost: pool+baseTot+swap};
-}
-/* v1 comparison: payout % of gross + bot leakage on all payouts */
-function v1(s,botMult){
-  const gross=s.rpu*s.dau*30;
-  const payouts=gross*0.60;
-  const botLoss=payouts*Math.min(0.12*botMult,0.85);
-  const swap=payouts*0.50*0.03;
-  const net=gross-payouts-botLoss-swap-s.fixed;
-  return {gross,net,margin:gross?net/gross*100:0,payoutCost:payouts+botLoss+swap,
-          bots:Math.round(s.dau*(s.botPct/100)*botMult)};
-}
-function prizes(pool,K,alpha){
-  let sum=0; for(let r=1;r<=K;r++) sum+=Math.pow(r,-alpha);
-  return {sum,at:r=>pool*Math.pow(r,-alpha)/sum};
-}
+      function model(v, gateOn, poolShare) {
+        var gross = v.users * v.arpu * 30 * (1 + v.uplift);
+        var poolFromRev = gross * poolShare;
+        var pool = poolFromRev + v.overlay;
+        var botCount = v.users * v.bots;
+        var claimReal = v.users * v.baseClaim * 30;
+        var claimBots = gateOn ? 0 : botCount * v.baseClaim * 30;
+        var botPoolLeak = gateOn ? 0 : pool * (botCount / Math.max(1, v.users + botCount));
+        var botLoss = claimBots + botPoolLeak;
+        var swap = pool * v.converted * SWAP_FEE;
+        var net = gross - poolFromRev - v.overlay - claimReal - swap - botLoss - v.infra;
+        return {
+          gross: gross, poolFromRev: poolFromRev, pool: pool, claim: claimReal,
+          swap: swap, botLoss: botLoss, botCount: botCount, net: net
+        };
+      }
 
-/* ---------- render ---------- */
-function render(){
-  const cad=CADS[CAD], m=model(S,1,GATE), o=v1(S,1);
+      function render() {
+        var v = read();
+        var m = model(v, v.gate, v.poolShare);
+        var v1 = model(v, false, 0.60);
 
-  /* diff table */
-  const rows=[
-    ['Punti pagati agli utenti','60% del lordo, variabile',S.poolPct+'% del lordo, deciso prima','Da rischio a parametro','up'],
-    ['Perdita per bot',usd(o.gross*0.60*0.12)+' al mese',GATE?'$0':usd(m.bots*S.base*30),GATE?'Eliminata dal gate':'Ridotta al solo claim base','up'],
-    ['Fee swap FaucetPay',usd(o.gross*0.60*0.50*0.03),usd(m.swap),'Meno payout, meno conversioni','up'],
-    ['Claim base garantito','non esisteva',usd(m.baseTot),'Nuovo costo, tiene vivi gli ultimi','down'],
-    ['Overlay sul pool','non esisteva',S.overlay?usd(S.overlay):'$0','Marketing con tetto noto',S.overlay?'down':'flat'],
-    ['Infrastruttura',usd(S.fixed),usd(S.fixed),'Cron di chiusura torneo in più','flat']
-  ];
-  $('#diff-rows').innerHTML=rows.map(r=>`<tr>
-    <td><span class="row-name">${r[0]}</span></td>
-    <td class="num c-mute">${r[1]}</td>
-    <td class="num big ${r[4]==='down'?'c-cost':'c-net'}">${r[2]}</td>
-    <td class="delta ${r[4]}">${r[3]}</td></tr>`).join('')
-    +`<tr class="total"><td>Utile netto mensile</td><td class="num c-mute">${usd(o.net)}</td>
-      <td class="num big c-net">${usd(m.net)}</td>
-      <td class="delta ${m.net>=o.net?'up':'down'}">${m.net>=o.net?'+':''}${usd(m.net-o.net)}</td></tr>`;
+        // readouts
+        el('oUsers').textContent = f(v.users, 0);
+        el('oArpu').textContent = '$' + f(v.arpu, 3);
+        el('oUplift').textContent = '+' + f(v.uplift * 100, 0) + '%';
+        el('oPool').textContent = f(v.poolShare * 100, 0) + '%';
+        el('oAlpha').textContent = f(v.alpha, 2);
+        el('oPaid').textContent = f(v.paidField * 100, 0) + '%';
+        el('oClaim').textContent = '$' + f(v.baseClaim, 3);
+        el('oBots').textContent = f(v.bots * 100, 0) + '%';
+        el('oConv').textContent = f(v.converted * 100, 0) + '%';
+        el('oOverlay').textContent = money(v.overlay, 0);
+        el('oInfra').textContent = money(v.infra, 0);
+        el('oMin').textContent = money(v.minW, 2);
 
-  /* prize structure */
-  const poolEvt = m.pool/30*cad.days;
-  const field = Math.round(S.dau*cad.reach);
-  const K = Math.max(Math.round(field*S.paidPct/100),1);
-  const P = prizes(poolEvt,K,S.alpha);
-  $('#pool-str').textContent=usd(poolEvt,2)+' '+cad.per;
-  $('#places-str').textContent=K.toLocaleString('it-IT')+' su '+field.toLocaleString('it-IT');
+        // KPI
+        var marginPct = m.gross > 0 ? m.net / m.gross * 100 : 0;
+        el('stampNet').textContent = money(m.net, 0);
+        var kNet = el('kNet');
+        kNet.textContent = money(m.net, 0);
+        kNet.className = 'big num ' + (m.net < 0 ? 'bad' : 'money');
+        el('kNetSub').textContent = money(m.net / 30, 1) + ' al giorno · lordo ' + money(m.gross, 0) + ' al mese';
 
-  const marks=[[1,'1º posto'],[2,'2º'],[3,'3º'],[Math.max(Math.round(K*0.05),4),'Top 5% del campo pagato'],
-               [Math.max(Math.round(K*0.25),5),'Primo quartile'],[Math.max(Math.round(K*0.5),6),'Mediana dei pagati'],
-               [K,'Bolla, ultimo pagato']];
-  const seen=new Set();
-  $('#prize-rows').innerHTML=marks.filter(x=>x[0]<=K&&!seen.has(x[0])&&seen.add(x[0])).map(x=>{
-    const p=P.at(x[0]);
-    return `<tr><td><span class="row-name">${x[1]}</span><span class="row-sub">posizione ${x[0].toLocaleString('it-IT')}</span></td>
-      <td class="num big ${p<0.02?'c-cost':'c-chip'}">${p<0.01?c4(p):usd(p,2)}</td>
-      <td class="num c-mute">${(p/poolEvt*100).toFixed(2).replace('.',',')}%</td>
-      <td class="num c-mute">${Math.round(p/Math.max(P.at(K),1e-9))}× la bolla</td></tr>`;
-  }).join('');
+        var tag = el('netTag');
+        if (m.net < 0) { tag.className = 'tagpill bad'; tag.textContent = 'in perdita'; }
+        else if (marginPct < 15) { tag.className = 'tagpill warn'; tag.textContent = 'fragile'; }
+        else { tag.className = 'tagpill ok'; tag.textContent = 'sostenibile'; }
 
-  const bubble=P.at(K), w=$('#bubble-warn');
-  if(bubble<0.02){
-    w.classList.add('on');
-    w.textContent=`La bolla vince ${c4(bubble)}: sotto la soglia dell'insulto. Riduci il campo pagato, alza la cadenza o appiattisci la curva, altrimenti chi arriva in fondo alla classifica si sente truffato invece che premiato.`;
-  } else w.classList.remove('on');
+        el('kMargin').textContent = f(marginPct, 1) + '%';
+        el('kMarginSub').textContent = 'Con pool al ' + f(v.poolShare * 100, 0) + '% il tetto teorico è ' +
+          f((1 - v.poolShare) * 100, 0) + '%. La differenza sono claim base, swap, bot e infrastruttura.';
 
-  /* curve chart */
-  const pts=[],labels=[];
-  const step=Math.max(1,Math.floor(K/60));
-  for(let r=1;r<=K;r+=step){labels.push(r);pts.push(+P.at(r).toFixed(5));}
-  curve.data.labels=labels;
-  curve.data.datasets[0].data=pts;
-  curve.update();
+        // prizes for chosen cadence
+        var poolPeriod = m.pool * days / 30;
+        var placesRaw = Math.max(1, Math.round(v.users * v.paidField));
+        var prizes = prizeList(poolPeriod, placesRaw, v.alpha);
+        var cadName = days === 1 ? 'Giornaliero' : (days === 7 ? 'Settimanale' : 'Mensile');
+        el('cadTag').textContent = cadName;
+        el('kTop').textContent = money(prizes[0], 2);
+        el('kTopSub').textContent = f(prizes[0] / poolPeriod * 100, 1) + '% di un montepremi da ' +
+          money(poolPeriod, 2) + ' · ' + f(placesRaw, 0) + ' posizioni pagate';
 
-  /* stress test */
-  const s1=v1(S,1), s2=v1(S,3.5), s3=model(S,1,GATE), s4=model(S,3.5,GATE);
-  const st=[['v1 · traffico pulito',S.dau+s1.bots,s1],['v1 · invasione bot',S.dau+s2.bots,s2],
-            ['v2 · traffico pulito',S.dau+s3.bots,s3],['v2 · invasione bot',S.dau+s4.bots,s4]];
-  $('#stress-rows').innerHTML=st.map((r,i)=>`<tr>
-    <td><span class="row-name">${r[0]}</span>${i===3?'<span class="row-sub">'+(GATE?'gate attivo':'gate disattivato')+'</span>':''}</td>
-    <td class="num c-mute">${r[1].toLocaleString('it-IT')}</td>
-    <td class="num c-cost">${usd(r[2].payoutCost)}</td>
-    <td class="num big ${r[2].net>=0?'c-net':'c-cost'}">${usd(r[2].net)}</td>
-    <td class="num ${r[2].margin>=15?'c-rev':r[2].margin>=0?'c-chip':'c-cost'}">${r[2].margin.toFixed(1).replace('.',',')}%</td></tr>`).join('');
+        // ledger V1 vs V2
+        el('l1v1').textContent = '60% del lordo, variabile';
+        el('l1v2').textContent = f(v.poolShare * 100, 0) + '% del lordo, deciso prima';
+        el('l2v1').textContent = v1.botLoss > 0 ? money(v1.botLoss, 0) + ' al mese' : money(0, 0);
+        el('l2v2').textContent = money(m.botLoss, 0);
+        el('l2eff').textContent = v.gate ? 'Eliminata dal gate' : 'Gate spento: la paghi tutta';
+        el('l3v1').textContent = money(v1.swap, 0);
+        el('l3v2').textContent = money(m.swap, 0);
+        el('l4v2').textContent = money(m.claim, 0);
+        el('l5v1').textContent = money(v.infra, 0);
+        el('l5v2').textContent = money(v.infra, 0);
+        el('l6v1').textContent = money(v1.net, 0);
+        el('l6v2').textContent = money(m.net, 0);
+        var delta = m.net - v1.net;
+        el('l6eff').textContent = (delta >= 0 ? '+' : '−') + money(Math.abs(delta), 0).replace('$', '$') + ' contro il V1';
 
-  /* summary */
-  $('#k-net').textContent=usd(m.net);
-  $('#k-net').style.color=m.net>=0?'var(--net)':'var(--cost)';
-  $('#k-net-note').textContent=`${usd(m.net/30,1)} al giorno · lordo ${usd(m.gross)} al mese`;
-  $('#k-margin').textContent=m.margin.toFixed(1).replace('.',',')+'%';
-  $('#k-margin').style.color=m.margin>=15?'var(--rev)':m.margin>=0?'var(--chip)':'var(--cost)';
-  $('#k-margin-note').textContent=`Con pool al ${S.poolPct}% il tetto teorico è ${(100-S.poolPct)}%. La differenza sono claim base, swap e infrastruttura.`;
-  const v=$('#verdict');
-  if(m.net<=0){v.className='flag bad';v.textContent='In perdita';}
-  else if(m.margin<12){v.className='flag bad';v.textContent='Fragile';}
-  else {v.className='flag ok';v.textContent='Sostenibile';}
-  $('#k-top').textContent=usd(P.at(1),2);
-  $('#cad-flag').textContent=cad.n;
-  $('#k-top-note').textContent=`Il titolo che metti in home. Bolla a ${c4(bubble)}, ${K.toLocaleString('it-IT')} posti pagati su ${field.toLocaleString('it-IT')} partecipanti.`;
-  const d=m.net-o.net;
-  $('#k-delta').textContent=(d>=0?'+':'')+usd(d);
-  $('#k-delta').style.color=d>=0?'var(--rev)':'var(--cost)';
-  $('#k-float').textContent=usd(m.pool+m.baseTot);
-}
+        // P&L
+        el('pGross').textContent = money(m.gross, 2);
+        el('grossDetail').textContent = f(v.users, 0) + ' utenti × ' + money(v.arpu, 3) + ' × 30 giorni, uplift +' + f(v.uplift * 100, 0) + '%';
+        el('pPool').textContent = '−' + money(m.poolFromRev, 2).replace('$', '$');
+        el('pOverlay').textContent = '−' + money(v.overlay, 2).replace('$', '$');
+        el('pClaim').textContent = '−' + money(m.claim, 2).replace('$', '$');
+        el('claimDetail').textContent = money(v.baseClaim, 3) + ' × ' + f(v.users, 0) + ' utenti × 30 giorni';
+        el('pSwap').textContent = '−' + money(m.swap, 2).replace('$', '$');
+        el('pBot').textContent = '−' + money(m.botLoss, 2).replace('$', '$');
+        el('botDetail').textContent = v.gate
+          ? 'gate attivo: nessun claim prima dell\'offerta'
+          : f(m.botCount, 0) + ' bot che incassano senza generare ricavo';
+        el('pInfra').textContent = '−' + money(v.infra, 2).replace('$', '$');
+        var pNet = el('pNet');
+        pNet.textContent = money(m.net, 2);
+        pNet.className = 'v num' + (m.net < 0 ? ' bad' : '');
+        el('netPct').textContent = f(marginPct, 1) + '% del lordo';
 
-/* ---------- chart ---------- */
-const ink='oklch(43% 0.016 275)',rule='oklch(83% 0.012 82)';
-const curve=new Chart($('#curve'),{
-  type:'line',
-  data:{labels:[],datasets:[{label:'Premio per posizione',data:[],
-    borderColor:'oklch(56% 0.132 52)',borderWidth:2,pointRadius:0,pointHoverRadius:4,
-    tension:.2,fill:true,backgroundColor:'oklch(91% 0.045 52)'}]},
-  options:{responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{display:false},
-      tooltip:{backgroundColor:'oklch(24% 0.018 275)',padding:10,cornerRadius:2,displayColors:false,
-        callbacks:{title:c=>'Posizione '+c[0].label,label:c=>usd(c.parsed.y,4)}}},
-    scales:{x:{title:{display:true,text:'posizione in classifica',color:ink,font:{size:11}},
-               grid:{display:false},border:{color:rule},ticks:{color:ink,font:{size:11},maxTicksLimit:9}},
-            y:{type:'logarithmic',grid:{color:rule},border:{display:false},
-               ticks:{color:ink,font:{size:11},callback:v=>usd(v,v<1?2:0)}}}}
-});
+        // break-even in utenti
+        var perUserMonth = v.arpu * 30 * (1 + v.uplift);
+        var varCost = perUserMonth * v.poolShare + v.baseClaim * 30 + (v.gate ? 0 : perUserMonth * 0);
+        var swapPerUser = perUserMonth * v.poolShare * v.converted * SWAP_FEE;
+        var contrib = perUserMonth - varCost - swapPerUser;
+        var fixed = v.infra + v.overlay + v.overlay * v.converted * SWAP_FEE;
+        var beUsers = contrib > 0 ? Math.ceil(fixed / contrib) : Infinity;
+        var bn = el('beNote');
+        if (contrib <= 0) {
+          bn.className = 'callout bad';
+          el('beText').textContent = 'Ogni utente ti costa più di quanto rende: pool al ' + f(v.poolShare * 100, 0) +
+            '% più claim base ' + money(v.baseClaim, 3) + ' non stanno dentro un ricavo di ' + money(v.arpu, 3) +
+            ' al giorno. Qui non è questione di volume, il modello va cambiato.';
+        } else if (m.net < 0) {
+          bn.className = 'callout warn';
+          el('beText').textContent = 'Ti servono circa ' + f(beUsers, 0) + ' utenti attivi al giorno per coprire ' +
+            money(fixed, 0) + ' di costi fissi. Ora sei a ' + f(v.users, 0) + ', quindi la differenza la metti tu: in fase di lancio è marketing, non un buco.';
+        } else {
+          bn.className = 'callout ok';
+          el('beText').textContent = 'Break-even a circa ' + f(beUsers, 0) + ' utenti al giorno, sei a ' + f(v.users, 0) +
+            '. Ogni utente in più porta ' + money(contrib, 2) + ' al mese di margine.';
+        }
 
-/* ---------- controls ---------- */
-$('#knobs').innerHTML=KNOBS.map(k=>`
-  <div class="knob">
-    <label for="i-${k.id}"><span class="k-name">${k.name}</span><span class="k-val" id="v-${k.id}"></span></label>
-    <input type="range" id="i-${k.id}" min="${k.min}" max="${k.max}" step="${k.step}" value="${S[k.id]}">
-    <p class="k-note">${k.note}</p>
-  </div>`).join('');
-KNOBS.forEach(k=>{
-  $('#v-'+k.id).textContent=k.fmt(S[k.id]);
-  $('#i-'+k.id).addEventListener('input',e=>{
-    S[k.id]=parseFloat(e.target.value);
-    $('#v-'+k.id).textContent=k.fmt(S[k.id]);
-    render();
-  });
-});
-document.querySelectorAll('#cadence button').forEach(b=>{
-  b.addEventListener('click',()=>{
-    document.querySelectorAll('#cadence button').forEach(x=>x.setAttribute('aria-pressed','false'));
-    b.setAttribute('aria-pressed','true');CAD=b.dataset.c;render();
-  });
-});
-$('#gate').addEventListener('change',e=>{GATE=e.target.checked;render();});
-render();
-</script>
+        // periods
+        var pers = [{ d: 1, n: 'Giornaliero' }, { d: 7, n: 'Settimanale' }, { d: 30, n: 'Mensile' }];
+        el('periods').innerHTML = pers.map(function (p) {
+          var pl = m.pool * p.d / 30;
+          var pr = prizeList(pl, placesRaw, v.alpha);
+          var dust = pr.filter(function (x) { return x < v.minW; }).length;
+          return '<div class="per' + (p.d === days ? ' on' : '') + '">' +
+            '<div class="lbl">' + p.n + '</div>' +
+            '<div class="p num">' + money(pl, 2) + '</div>' +
+            '<div class="t">1º premio ' + money(pr[0], 2) + ' · ' + f(placesRaw, 0) + ' pagati · ' +
+            (dust > 0 ? f(dust, 0) + ' sotto il minimo' : 'tutti incassabili') + '</div></div>';
+        }).join('');
+
+        // dust note
+        var dustCount = prizes.filter(function (x) { return x < v.minW; }).length;
+        var dn = el('dustNote');
+        if (dustCount > 0) {
+          dn.className = 'callout warn';
+          el('dustText').textContent = f(dustCount, 0) + ' premi su ' + f(prizes.length, 0) + ' stanno sotto il minimo di prelievo di ' +
+            money(v.minW, 2) + '. L\'ultimo prende ' + money(prizes[prizes.length - 1], 4) +
+            ': si accumula tra stagioni, ma va scritto in pagina o passa per una fregatura. Per farlo sparire: alza la concentrazione, stringi il campo pagato o allunga la cadenza.';
+        } else {
+          dn.className = 'callout ok';
+          el('dustText').textContent = 'Tutti i ' + f(prizes.length, 0) + ' premi sono incassabili subito: l\'ultimo prende ' +
+            money(prizes[prizes.length - 1], 4) + ', sopra il minimo di ' + money(v.minW, 2) + '.';
+        }
+
+        // prize table
+        var idx = [], n = prizes.length;
+        for (var i = 0; i < Math.min(5, n); i++) idx.push(i);
+        var mid = Math.floor(n / 2);
+        if (mid > 5) idx.push(mid);
+        for (var j = Math.max(idx[idx.length - 1] + 1, n - 3); j < n; j++) idx.push(j);
+        idx = idx.filter(function (x, k, a) { return a.indexOf(x) === k && x < n; });
+
+        el('prizeRows').innerHTML = idx.map(function (i) {
+          var p = prizes[i];
+          var dust = p < v.minW;
+          return '<tr' + (dust ? ' class="dust"' : '') + '><td class="rank">' + (i + 1) + 'º</td>' +
+            '<td class="prize">' + money(p, 4) + '</td>' +
+            '<td>' + f(p / poolPeriod * 100, 2) + '%</td>' +
+            '<td>' + (v.baseClaim > 0 ? f(Math.round(p / v.baseClaim), 0) : '—') + '</td></tr>';
+        }).join('');
+
+        // chart
+        var top = prizes.slice(0, 24);
+        var labels = top.map(function (_, i) { return (i + 1) + 'º'; });
+        var colors = top.map(function (p) { return p < v.minW ? 'oklch(60% 0.15 28)' : 'oklch(70% 0.13 152)'; });
+        if (chart) {
+          chart.data.labels = labels;
+          chart.data.datasets[0].data = top;
+          chart.data.datasets[0].backgroundColor = colors;
+          chart.update('none');
+        } else if (window.Chart) {
+          chart = new Chart(el('chart'), {
+            type: 'bar',
+            data: { labels: labels, datasets: [{ data: top, backgroundColor: colors, borderRadius: 3, borderSkipped: false }] },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { legend: { display: false }, tooltip: { callbacks: { label: function (c) { return money(c.parsed.y, 4); } } } },
+              scales: {
+                x: { grid: { display: false }, ticks: { color: 'oklch(66% 0.018 72)', font: { size: 10 } } },
+                y: { grid: { color: 'oklch(30% 0.016 70)' }, ticks: { color: 'oklch(66% 0.018 72)', font: { size: 10 }, callback: function (val) { return '$' + f(val, 2); } } }
+              },
+              animation: { duration: 200 }
+            }
+          });
+        }
+      }
+
+      ids.forEach(function (id) { el(id).addEventListener('input', render); });
+      el('gate').addEventListener('change', render);
+      el('cadence').addEventListener('click', function (e) {
+        var b = e.target.closest('button');
+        if (!b) return;
+        this.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+        days = +b.dataset.days;
+        render();
+      });
+
+      if (window.Chart) render();
+      else window.addEventListener('load', render);
+      render();
+    })();
+  </script>
 </body>
 </html>
